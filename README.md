@@ -9,11 +9,13 @@
 - 内存存储（无需持久化）
 
 ## 非JDK标准库说明
+- spring-boot-starter-thymeleaf ：用于构建UI界面。
 - spring-boot-starter-web ：用于构建RESTful API。
 - spring-boot-starter-cache ：用于应用缓存机制。
 - spring-boot-starter-validation ：用于参数验证。
 - spring-boot-starter-test ：用于单元测试。
 - mockito-core ：用于模拟对象。
+- hutool-core ：常用工具类库。
 
 ## API文档
 - 创建交易 ： POST /api/transactions
@@ -25,7 +27,7 @@
 ## 运行项目
 1. 克隆项目到本地：
 ```bash
-git clone https://github.com/your-repo/transaction-management.git
+git clone https://github.com/jerzygao/transaction-management.git
 cd transaction-management
 ```
 2. 使用Maven构建项目：

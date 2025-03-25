@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction Management</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4" id="app">
+    <h2>Transactions 
+        <button class="btn btn-primary float-end" @click="showCreateModal">Add New</button>
+    </h2>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Time</th>
+                <th>Type</th>
+                <th>description</th>
+                <th>Amount</th>
+                <th>Source Account</th>
+                <th>Target Account</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="tx in transactions">
+                <td>{{ tx.id }}</td>
+                <td>{{ new Date(tx.transactionTime).toLocaleString() }}</td>
+                <td>{{ tx.type }}</td>
+                <td>{{ tx.description }}</td>
+                <td>{{ tx.amount }}</td>
+                <td>{{ tx.sourceAccount }}</td>
+                <td>{{ tx.targetAccount }}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" @click="deleteTransaction(tx.id)">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <nav v-if="totalPages > 1">
+        <ul class="pagination">
+            <li class="page-item" v-for="page in totalPages" :key="page">
+                <a class="page-link" href="#" @click.prevent="loadPage(page-1)">{{ page }}</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Modal 对话框代码与Vue逻辑 -->
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    currentPage: 0,
+                    pageSize: 10,
+                    total: 0,
+                    transactions: []
+                }
+            },
+            computed: {
+                totalPages() {
+                    return Math.ceil(this.total / this.pageSize);
+                }
+            },
+            mounted() {
+                this.loadPage(0);
+            },
+            methods: {
+                async loadPage(page) {
+                    const response = await axios.get(`/api/transactions/page?page=${page}&size=${this.pageSize}`);
+                    this.transactions = response.data.data;
+                    this.total = response.data.total;
+                    this.currentPage = page;
+                },
+                async deleteTransaction(id) {
+                    if(confirm('确认删除？')) {
+                        await axios.delete(`/api/transactions/${id}`);
+                        this.loadPage(this.currentPage);
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</div>
+</body>
+</html>

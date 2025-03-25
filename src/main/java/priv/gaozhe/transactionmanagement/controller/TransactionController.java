@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import priv.gaozhe.transactionmanagement.model.PageResult;
 import priv.gaozhe.transactionmanagement.model.Transaction;
 import priv.gaozhe.transactionmanagement.service.TransactionService;
 
@@ -53,4 +54,16 @@ public class TransactionController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    // 新增分页查询接口
+    @GetMapping("/page")
+    public ResponseEntity<PageResult<Transaction>> getTransactionsByPage(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+        
+        List<Transaction> data = transactionService.listByTime(page, size,true);
+        int total = transactionService.getTotalCount();
+        return new ResponseEntity<>(new PageResult<>(data, total), HttpStatus.OK);
+    }
+
 }

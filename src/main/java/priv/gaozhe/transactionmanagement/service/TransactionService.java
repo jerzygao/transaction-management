@@ -34,4 +34,12 @@ public class TransactionService {
     public Transaction updateTransaction(Transaction transaction) {
         return transactionRepository.update(transaction);
     }
+
+    public List<Transaction> listByTime(int page, int pageSize, boolean ascending) {
+        return transactionRepository.listByTime(page, pageSize, ascending);
+    }
+
+    public int getTotalCount() {
+        return transactionRepository.getTotalCount();
+    }
 }
