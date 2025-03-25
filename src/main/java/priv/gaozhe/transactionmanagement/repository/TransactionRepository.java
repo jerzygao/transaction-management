@@ -1,6 +1,6 @@
 package priv.gaozhe.transactionmanagement.repository;
 
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Repository;
 import priv.gaozhe.transactionmanagement.model.Transaction;
 
@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
+@CacheConfig(cacheNames = "transactions")
 public class TransactionRepository {
     // 改用更安全的并发有序集合
     private final Map<String, Transaction> idMap = new ConcurrentHashMap<>();
@@ -22,6 +23,10 @@ public class TransactionRepository {
     private final ReentrantReadWriteLock.ReadLock readLock = rwLock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = rwLock.writeLock();
 
+    @Caching(
+        put = @CachePut(key = "#transaction.id"),
+        evict = @CacheEvict(value = "transactionLists", allEntries = true)
+    )
     public Transaction save(Transaction transaction) {
         writeLock.lock();
         try {
@@ -36,6 +41,7 @@ public class TransactionRepository {
         }
     }
 
+    @Cacheable(key = "#id")
     public Optional<Transaction> findById(String id) {
         readLock.lock();
         try {
@@ -55,6 +61,7 @@ public class TransactionRepository {
         }
     }
 
+    @CacheEvict(value = {"transactions", "transactionLists"}, allEntries = true)
     public void deleteById(String id) {
         writeLock.lock();
         try {
@@ -67,6 +74,10 @@ public class TransactionRepository {
         }
     }
 
+    @Caching(
+        put = @CachePut(key = "#transaction.id"),
+        evict = @CacheEvict(value = "transactionLists", allEntries = true)
+    )
     public Transaction update(Transaction transaction) {
         writeLock.lock();
         try {
@@ -85,13 +96,14 @@ public class TransactionRepository {
     }
 
 
+    @Cacheable(value = "transactionLists", keyGenerator = "pageKeyGenerator")
     public List<Transaction> listByTime(int page, int pageSize, boolean ascending) {
         if (page < 0) {
             throw new IllegalArgumentException("Page index must be >= 0");
         }
         if (pageSize <= 0) {
             throw new IllegalArgumentException("Page size must be > 0");
-        } ;
+        } 
 
         readLock.lock();
         try {
