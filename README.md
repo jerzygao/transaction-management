@@ -44,6 +44,14 @@ java -jar target/transaction-management-1.0-SNAPSHOT.jar
 
 运行成功后访问 [http://localhost:8080/transactions](http://localhost:8080/transactions)查看交易列表
 
+## 容器化部署
+使用Dockerfile构建Docker镜像并运行容器：
+
+```bash
+docker build -t transaction-management .
+docker run -p 8080:8080 transaction-management
+ ```
+
 ## 单元测试
 运行以下命令执行单元测试：
 
@@ -52,12 +60,25 @@ mvn test
  ```
 
 ## 压力测试
-使用Gatling进行压力测试，确保API性能稳定。
+使用 JMeter进行压力测试，确保API性能稳定。
+### 安装 JMeter
 
-## 容器化部署
-使用Dockerfile构建Docker镜像并运行容器：
+下载地址：https://jmeter.apache.org/download_jmeter.cgi
+
+确保已安装 Java 8+ 环境（运行 JMeter 需要 Java）。
+
+解压后，运行 bin/jmeter.bat（Windows）或 bin/jmeter.sh（Mac/Linux）启动。
+
+添加 JMeter 的 bin 目录到 PATH 环境变量（方便直接运行命令）
+
+运行测试（Windows）
 
 ```bash
-docker build -t transaction-management .
-docker run -p 8080:8080 transaction-management
+cd transaction-management
+jmeter -n -t .\jmeter-test\TransactionStressTest.jmx -l report.jtl
+ ```
+生成HTML报告
+
+```bash
+jmeter -g report.jtl -o stress-report/
  ```
