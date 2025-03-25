@@ -1,22 +1,42 @@
 package priv.gaozhe.transactionmanagement.model;
 
 import jakarta.validation.constraints.NotNull;
+
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * 交易记录实体
+ */
 public class Transaction {
-    private String id;
     @NotNull
-    private TransactionType type; // 修改为枚举类型
+    private String id;
+    /**
+     * 交易类型
+     */
+    @NotNull
+    private TransactionType type;
+    /**
+     * 交易金额
+     */
     @NotNull
     private double amount;
-    // 新增属性：交易时间
+    /**
+     * 交易时间
+     */
+    @NotNull
     private Date transactionTime;
-    // 新增属性：交易描述
+    /**
+     * 交易描述
+     */
     private String description;
-    // 新增属性：交易来源账户
+    /**
+     * 交易来源账户
+     */
     private String sourceAccount;
-    // 新增属性：交易目标账户
+    /**
+     * 交易目标账户
+     */
     private String targetAccount;
 
     public Transaction() {

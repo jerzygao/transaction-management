@@ -93,7 +93,6 @@
         </div>
     </div>
 
-    <!-- 在现有Vue脚本中添加以下内容 -->
     <script>
         const { createApp } = Vue;
         
@@ -147,11 +146,12 @@
                             amount: Number(this.formData.amount)
                         });
                         this.loadPage(this.currentPage);
-                        // 修复2：使用更可靠的模态框关闭方式
                         const modalEl = document.getElementById('transactionModal');
                         bootstrap.Modal.getInstance(modalEl)?.hide();
                     } catch (error) {
-                        alert('保存失败: ' + error.message);
+                        // 修改错误处理逻辑
+                        const errorMsg = error.response?.data?.message || error.message;
+                        alert(`保存失败: ${errorMsg}`);
                     }
                 }
             }

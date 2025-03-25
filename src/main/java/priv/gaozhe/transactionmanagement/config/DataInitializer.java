@@ -14,6 +14,9 @@ import java.util.Random;
 
 import static priv.gaozhe.transactionmanagement.model.TransactionType.*;
 
+/**
+ * 程序启动时初始化部分数据
+ */
 @Component
 public class DataInitializer implements CommandLineRunner {
     private final TransactionRepository repository;
@@ -39,7 +42,6 @@ public class DataInitializer implements CommandLineRunner {
         double amount = RandomUtil.randomDouble(1000, 2, RoundingMode.HALF_UP);
         String sourceAccount = "MyAccount";
         String targetAccount = RandomUtil.randomNumbers(20);
-        Transaction initData = new Transaction();
         if (WITHDRAWAL == type || PAYMENT == type) {
             amount = 0 - amount;
         }
@@ -51,6 +53,9 @@ public class DataInitializer implements CommandLineRunner {
             targetAccount = "";
         }
 
-        return new Transaction(type, amount, type.getName(), sourceAccount, targetAccount);
+        Transaction initData = new Transaction(type, amount, type.getName(), sourceAccount, targetAccount);
+        initData.setTransactionTime(RandomUtil.randomDay(-300, 0));
+
+        return initData;
     }
 }

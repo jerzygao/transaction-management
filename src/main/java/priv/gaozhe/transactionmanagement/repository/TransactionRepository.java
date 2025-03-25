@@ -9,20 +9,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * 交易数据存储实现类
+ * 特性：
+ * 1. 基于内存的并发安全存储
+ * 2. 双重存储结构（ID哈希表+时间有序集合）
+ * 3. 读写锁控制并发访问
+ * 4. Spring Cache缓存集成
+ */
 @Repository
 @CacheConfig(cacheNames = "transactions")
 public class TransactionRepository {
-    // 改用更安全的并发有序集合
     private final Map<String, Transaction> idMap = new ConcurrentHashMap<>();
-    private final NavigableSet<Transaction> timeSet = new ConcurrentSkipListSet<>( // 修改点1
+    private final NavigableSet<Transaction> timeSet = new ConcurrentSkipListSet<>( 
             Comparator.comparing(Transaction::getTransactionTime, Comparator.nullsLast(Comparator.naturalOrder()))
                     .thenComparing(Transaction::getId, Comparator.nullsLast(Comparator.naturalOrder()))
     );
-    // 替换为读写锁
+     // 使用读写锁保证并发安全（写操作独占，读操作共享）
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock readLock = rwLock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = rwLock.writeLock();
 
+     /**
+     * 保存交易记录
+     * @param transaction 交易对象（必须包含唯一ID）
+     * @return 已保存的交易对象
+     * @throws IllegalArgumentException 当ID重复时抛出
+     */
     @Caching(
         put = @CachePut(key = "#transaction.id"),
         evict = @CacheEvict(value = "transactionLists", allEntries = true)
@@ -33,8 +46,8 @@ public class TransactionRepository {
             if (idMap.containsKey(transaction.getId())) {
                 throw new IllegalArgumentException("Duplicate ID: " + transaction.getId());
             }
-            idMap.put(transaction.getId(), transaction); // 修正变量名错误
-            timeSet.add(transaction);                    // 修正变量名错误
+            idMap.put(transaction.getId(), transaction);
+            timeSet.add(transaction);
             return transaction;
         } finally {
             writeLock.unlock();
@@ -95,7 +108,14 @@ public class TransactionRepository {
         }
     }
 
-
+ /**
+     * 分页查询交易记录
+     * @param page 页码（从0开始）
+     * @param pageSize 每页记录数
+     * @param ascending 是否按时间升序排列
+     * @return 不可修改的交易列表
+     * @throws IllegalArgumentException 当分页参数非法时抛出
+     */
     @Cacheable(value = "transactionLists", keyGenerator = "pageKeyGenerator")
     public List<Transaction> listByTime(int page, int pageSize, boolean ascending) {
         if (page < 0) {
@@ -111,7 +131,6 @@ public class TransactionRepository {
             Iterator<Transaction> iterator = ascending ?
                     timeSet.iterator() : timeSet.descendingIterator();
 
-            // 修复点4：修正缩进对齐
             int skip = page * pageSize;
             for (int i = 0; i < skip && iterator.hasNext(); i++) {
                 iterator.next();
@@ -127,7 +146,6 @@ public class TransactionRepository {
         }
     }
 
-    // 获取总记录数（可选）
     public int getTotalCount() {
         return idMap.size();
     }
