@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TransactionServiceTest {
+class TransactionServiceTest {
+
     @Mock
     private TransactionRepository transactionRepository;
 
@@ -24,60 +25,25 @@ public class TransactionServiceTest {
     private TransactionService transactionService;
 
 //    @Test
-//    public void testCreateTransaction() {
-//        Transaction transaction = new Transaction("Deposit", 1000.0);
-//        when(transactionRepository.save(transaction)).thenReturn(transaction);
+//    void deleteTransactionSuccess() {
+//        // 准备
+//        Long existingId = 1L;
+//        given(transactionRepository.existsById(existingId)).willReturn(true);
 //
-//        Transaction createdTransaction = transactionService.createTransaction(transaction);
+//        // 执行
+//        transactionService.deleteTransaction(existingId);
 //
-//        assertNotNull(createdTransaction);
-//        assertEquals(transaction, createdTransaction);
-//        verify(transactionRepository, times(1)).save(transaction);
+//        // 验证
+//        verify(transactionRepository).deleteById(existingId);
 //    }
 //
 //    @Test
-//    public void testGetTransactionById() {
-//        String id = "123";
-//        Transaction transaction = new Transaction("Deposit", 1000.0);
-//        transaction.setId(id);
-//        when(transactionRepository.findById(id)).thenReturn(Optional.of(transaction));
+//    void deleteTransactionNotFound() {
+//        Long nonExistingId = 999L;
+//        given(transactionRepository.existsById(nonExistingId)).willReturn(false);
 //
-//        Optional<Transaction> result = transactionService.getTransactionById(id);
-//
-//        assertTrue(result.isPresent());
-//        assertEquals(transaction, result.get());
-//        verify(transactionRepository, times(1)).findById(id);
-//    }
-//
-//    @Test
-//    public void testGetAllTransactions() {
-//        List<Transaction> transactions = new ArrayList<>();
-//        transactions.add(new Transaction("Deposit", 1000.0));
-//        when(transactionRepository.findAll()).thenReturn(transactions);
-//
-//        List<Transaction> result = transactionService.getAllTransactions();
-//
-//        assertNotNull(result);
-//        assertEquals(transactions.size(), result.size());
-//        verify(transactionRepository, times(1)).findAll();
-//    }
-//
-//    @Test
-//    public void testDeleteTransaction() {
-//        String id = "123";
-//        transactionService.deleteTransaction(id);
-//        verify(transactionRepository, times(1)).deleteById(id);
-//    }
-//
-//    @Test
-//    public void testUpdateTransaction() {
-//        Transaction transaction = new Transaction("Deposit", 1000.0);
-//        when(transactionRepository.update(transaction)).thenReturn(transaction);
-//
-//        Transaction updatedTransaction = transactionService.updateTransaction(transaction);
-//
-//        assertNotNull(updatedTransaction);
-//        assertEquals(transaction, updatedTransaction);
-//        verify(transactionRepository, times(1)).update(transaction);
+//        assertThrows(EntityNotFoundException.class, () -> {
+//            transactionService.deleteTransaction(nonExistingId);
+//        });
 //    }
 }

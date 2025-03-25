@@ -22,7 +22,8 @@
 - 获取交易 ： GET /api/transactions/{id}
 - 获取所有交易 ： GET /api/transactions
 - 删除交易 ： DELETE /api/transactions/{id}
-- 更新交易 ： PUT /api/transactions/{id}
+- 全量更新交易 ： PUT /api/transactions/{id}
+- 分页查询 ： GET /api/transactions/page?page=0&size=10
 
 ## 运行项目
 1. 克隆项目到本地：
@@ -39,7 +40,9 @@ mvn clean package
 ```bash
 java -jar target/transaction-management-1.0-SNAPSHOT.jar
  ```
+## 访问交易列表
 
+运行成功后访问 [http://localhost:8080/transactions](http://localhost:8080/transactions)查看交易列表
 
 ## 单元测试
 运行以下命令执行单元测试：

@@ -15,23 +15,23 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public Transaction createTransaction(Transaction transaction) {
+    public Transaction save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
 
-    public Optional<Transaction> getTransactionById(String id) {
+    public Optional<Transaction> findById(String id) {
         return transactionRepository.findById(id);
     }
 
-    public List<Transaction> getAllTransactions() {
+    public List<Transaction> findAll() {
         return transactionRepository.findAll();
     }
 
-    public void deleteTransaction(String id) {
+    public void deleteById(String id) {
         transactionRepository.deleteById(id);
     }
 
-    public Transaction updateTransaction(Transaction transaction) {
+    public Transaction update(Transaction transaction) {
         return transactionRepository.update(transaction);
     }
 

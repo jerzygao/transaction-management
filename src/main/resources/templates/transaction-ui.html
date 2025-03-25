@@ -3,6 +3,7 @@
 <head>
     <title>Transaction Management</title>
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <div class="container mt-4" id="app">
@@ -50,6 +51,49 @@
     <!-- Modal 对话框代码与Vue逻辑 -->
     <script src="https://unpkg.com/vue@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 添加模态框 -->
+    <div class="modal fade" id="transactionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="saveTransaction">
+                        <div class="mb-3">
+                            <label>Type</label>
+                            <select class="form-select" v-model="formData.type" required>
+                                <option value="TRANSFER">Transfer</option>
+                                <option value="DEPOSIT">Deposit</option>
+                                <option value="WITHDRAWAL">Withdrawal</option>
+                            </select>
+                        </div>
+                        <!-- 其他表单字段（金额、描述、账户等） -->
+                        <div class="mb-3">
+                            <label>Amount</label>
+                            <input type="number" class="form-control" v-model="formData.amount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Description</label>
+                            <input type="text" class="form-control" v-model="formData.description">
+                        </div>
+                        <div class="mb-3">
+                            <label>Source Account</label>
+                            <input type="text" class="form-control" v-model="formData.sourceAccount">
+                        </div>
+                        <div class="mb-3">
+                            <label>Target Account</label>
+                            <input type="text" class="form-control" v-model="formData.targetAccount">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 在现有Vue脚本中添加以下内容 -->
     <script>
         const { createApp } = Vue;
         
@@ -59,9 +103,11 @@
                     currentPage: 0,
                     pageSize: 10,
                     total: 0,
-                    transactions: []
+                    transactions: [],
+                    formData: { /* 表单数据保持不变 */ }
                 }
             },
+            // 添加计算属性
             computed: {
                 totalPages() {
                     return Math.ceil(this.total / this.pageSize);
@@ -81,6 +127,31 @@
                     if(confirm('确认删除？')) {
                         await axios.delete(`/api/transactions/${id}`);
                         this.loadPage(this.currentPage);
+                    }
+                },
+                showCreateModal() {
+                    this.formData = { // 重置表单数据
+                        type: 'TRANSFER',
+                        amount: 0,
+                        description: '',
+                        sourceAccount: '',
+                        targetAccount: ''
+                    };
+                    new bootstrap.Modal(document.getElementById('transactionModal')).show();
+                },
+                
+                async saveTransaction() {
+                    try {
+                        await axios.post('/api/transactions', {
+                            ...this.formData,
+                            amount: Number(this.formData.amount)
+                        });
+                        this.loadPage(this.currentPage);
+                        // 修复2：使用更可靠的模态框关闭方式
+                        const modalEl = document.getElementById('transactionModal');
+                        bootstrap.Modal.getInstance(modalEl)?.hide();
+                    } catch (error) {
+                        alert('保存失败: ' + error.message);
                     }
                 }
             }
